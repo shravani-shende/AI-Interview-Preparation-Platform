@@ -1,0 +1,45 @@
+import axios from "axios"
+
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    withCredentials: true
+})
+export async function register({ username, email, password }) {
+    try {
+        const res = await api.post("/api/auth/register", { username, email, password })
+        return res;
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
+
+export async function login({ email, password }) {
+    try {
+        const res = await api.post("/api/auth/login", { email, password })
+        return res;
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
+
+export async function logout() {
+    try {
+        const res = await api.get("/api/auth/logout")
+        return res
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
+
+export async function getMe() {
+    try {
+        const res = await api.get("/api/auth/get-me")
+        return res
+    } catch (err) {
+        console.log(err)
+        throw err
+    }
+}
