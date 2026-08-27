@@ -41,7 +41,7 @@ export const useInterview = () => {
         } finally {
             setLoading(false)
         }
-        return response.interviewReport
+        return response?.interviewReport
     }
 
     const getReports = async () => {
@@ -52,11 +52,12 @@ export const useInterview = () => {
             setReports(response.interviewReports)
         } catch (error) {
             console.log(error)
+            setReports([])
         } finally {
             setLoading(false)
         }
 
-        return response.interviewReports
+        return response?.interviewReports || []
     }
 
     const generateMore = async (section) => {
