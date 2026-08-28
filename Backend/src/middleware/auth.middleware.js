@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken")
 const {redisClient} = require("../config/redis")
 
 async function authLogoutUser(req,res,next){
-    const token = req.cookies.token
+    const token = req.cookies.token || getBearerToken(req)
 
     if(!token){
         return res.status(401).json({
@@ -21,6 +21,7 @@ async function authLogoutUser(req,res,next){
 
     try{
         const decode = await jwt.verify(token , process.env.JWT_SECRET)
+        req.authToken = token
         req.user= decode
         next()
     }catch(err){
@@ -32,7 +33,7 @@ async function authLogoutUser(req,res,next){
 }
 
 const authUser = async (req,res,next)=>{
-    const token = req.cookies.token
+    const token = req.cookies.token || getBearerToken(req)
     if(!token){
         return res.status(401).json({
             message:"unauthrized."
@@ -40,6 +41,7 @@ const authUser = async (req,res,next)=>{
     }
      try{
         const decode = await jwt.verify(token , process.env.JWT_SECRET)
+          req.authToken = token
         req.user= decode
         next()
     }catch(err){
@@ -49,6 +51,13 @@ const authUser = async (req,res,next)=>{
     }
 
     
+}
+
+function getBearerToken(req) {
+    const authorization = req.headers.authorization
+    return authorization?.startsWith("Bearer ")
+        ? authorization.slice(7)
+        : null
 }
 
 module.exports= {authLogoutUser,authUser}

@@ -4,6 +4,24 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     withCredentials: true
 })
+
+export const getAuthToken = () => sessionStorage.getItem("authToken")
+
+export const setAuthToken = (token) => {
+    if (token) {
+        sessionStorage.setItem("authToken", token)
+    } else {
+        sessionStorage.removeItem("authToken")
+    }
+}
+
+api.interceptors.request.use((config) => {
+    const token = getAuthToken()
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
 export async function register({ username, email, password }) {
     try {
         const res = await api.post("/api/auth/register", { username, email, password })

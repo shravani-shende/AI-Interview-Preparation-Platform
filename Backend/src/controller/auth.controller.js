@@ -41,12 +41,14 @@ async function registerUserController(req, res) {
 
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false,
+        sameSite: "none",
+        // secure: process.env.NODE_ENV === "production",
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000
     });
     return res.status(200).json({
-        message: "user succesfully created."
+        message: "user succesfully created.",
+        token
     })
 
 }
@@ -79,8 +81,9 @@ async function login(req, res) {
 
     res.cookie("token", token, {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false,
+        sameSite: "none",
+        // secure: process.env.NODE_ENV === "production",
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -97,7 +100,7 @@ async function login(req, res) {
 }
 
 async function logOut(req, res) {
-    const token = req.cookies.token;
+    const token = req.authToken || req.cookies.token;
     if (!token) {
         return res.status(401).json({
             message: "user unauthorized."
@@ -120,8 +123,8 @@ async function logOut(req, res) {
 
     res.clearCookie("token", {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false
+        sameSite: "none",
+        secure: process.env.NODE_ENV === "production"
     });
     return res.status(200).json({
         message: "user loged out successfully.."
