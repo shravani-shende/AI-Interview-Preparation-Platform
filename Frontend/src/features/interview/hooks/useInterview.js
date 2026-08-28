@@ -1,5 +1,5 @@
 import { getAllInterviewReports, generateInterviewReport, getInterviewReportById, generateMoreInterviewContent } from "../services/interview.api"
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import { InterviewContext } from "../interview.context"
 import { useParams } from "react-router"
 
@@ -14,14 +14,18 @@ export const useInterview = () => {
     }
 
     const { loading, setLoading, report, setReport, reports, setReports } = context
+    const [error, setError] = useState(null)
 
     const generateReport = async ({ jobDescription, selfDescription, resumeFile }) => {
         setLoading(true)
+        setError(null)
         let response = null
         try {
             response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
             setReport(response.interviewReport)
         } catch (error) {
+            const message = error.response?.data?.message || "Could not generate the interview plan. Please try again."
+            setError(message)
             console.error(error.response?.data?.error || error.message)
         } finally {
             setLoading(false)
@@ -82,6 +86,6 @@ export const useInterview = () => {
         }
     }, [ interviewId ])
 
-    return { loading, report, reports, generateReport, generateMore, getReportById, getReports }
+    return { loading, error, report, reports, generateReport, generateMore, getReportById, getReports }
 
 }

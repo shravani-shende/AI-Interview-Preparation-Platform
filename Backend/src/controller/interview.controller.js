@@ -35,8 +35,11 @@ async function generateInterviewReportController(req,res){
         })
     } catch (error) {
         console.error("Interview report generation failed:", error)
-        res.status(500).json({
-            message:"Interview report generation failed",
+        const isTemporaryAiFailure = error?.status === 503 || error?.code === 503
+        res.status(isTemporaryAiFailure ? 503 : 500).json({
+            message: isTemporaryAiFailure
+                ? "The AI service is temporarily busy. Please try again in a moment."
+                : "Interview report generation failed",
             error:error.message
         })
     }

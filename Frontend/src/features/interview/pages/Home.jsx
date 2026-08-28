@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { useAuth } from '../../auth/hooks/useAuth'
 
 const Home = () => {
-    const {loading,generateReport,reports}= useInterview()
+    const {loading, error, generateReport,reports}= useInterview()
     const { handleLogout } = useAuth()
     const [jobDescription, setJobDescription] = useState("")
     const [selfDescription, setSelfDescription] = useState("")
@@ -91,6 +91,7 @@ const Home = () => {
                     <span>AI-powered strategy generation <em>/</em> Approx 30s</span>
                     <button onClick={handleGenerateReport} className="button generateButton" type="button"><span aria-hidden="true">✦</span> Generate My Interview Strategy</button>
                 </footer>
+                {error && <p className="generation-error" role="alert">{error}</p>}
             </section>
 
             {reports?.length > 0 && (

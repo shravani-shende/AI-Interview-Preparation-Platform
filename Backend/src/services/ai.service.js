@@ -186,14 +186,26 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
         ${jobDescription}
         `;
 
-    const res = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: interviewReportResponseSchema
+    let res
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+            res = await ai.models.generateContent({
+                model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: interviewReportResponseSchema
+                }
+            })
+            break
+        } catch (error) {
+            const isTemporary = error?.status === 503 || error?.code === 503
+            if (!isTemporary || attempt === 1) {
+                throw error
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1500))
         }
-    })
+    }
     return interviewReportSchema.parse(JSON.parse(res.text))
 }
 
